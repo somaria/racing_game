@@ -12,7 +12,7 @@ class RacingGame extends FlameGame with HasCollisionDetection {
   late Road _road;
   late HUD _hud;
   late SteeringWheel _steeringWheel;
-  double _spawnTimer = 0.0;
+  double _spawnTimer = 2.5; // Start at 2.5 so first car spawns after 2 seconds
   final Random _random = Random();
   int _score = 0;
   bool _gameOver = false;
@@ -45,8 +45,8 @@ class RacingGame extends FlameGame with HasCollisionDetection {
     // Update spawn timer
     _spawnTimer += dt;
 
-    // Every 2.5 seconds, spawn a new enemy car
-    if (_spawnTimer > 2.5) {
+    // Every 4.5 seconds, spawn a new enemy car (balanced difficulty)
+    if (_spawnTimer > 4.5) {
       _spawnTimer = 0.0;
       _spawnEnemyCar();
       _score += 10;
@@ -58,11 +58,39 @@ class RacingGame extends FlameGame with HasCollisionDetection {
     final lanes = [80.0, 160.0, 240.0];
     double xPosition = lanes[_random.nextInt(lanes.length)];
 
+    // Check if there's already a car too close in this lane
+    final existingCars = children.whereType<EnemyCar>();
+    bool tooClose = false;
+
+    for (final car in existingCars) {
+      // Check if car is in the same lane and too close to the top (moderate distance)
+      if ((car.position.x - xPosition).abs() < 50 && car.position.y < 280) {
+        tooClose = true;
+        break;
+      }
+    }
+
+    // If too close, try a different lane or skip this spawn
+    if (tooClose) {
+      // Try other lanes
+      final availableLanes = lanes.where((lane) {
+        return !existingCars.any(
+          (car) => (car.position.x - lane).abs() < 50 && car.position.y < 280,
+        );
+      }).toList();
+
+      if (availableLanes.isEmpty) {
+        return; // Skip this spawn if all lanes are occupied
+      }
+
+      xPosition = availableLanes[_random.nextInt(availableLanes.length)];
+    }
+
     final colors = [Colors.red, Colors.green, Colors.orange, Colors.purple];
     Color color = colors[_random.nextInt(colors.length)];
 
-    // Create enemy car and add it to the game
-    add(EnemyCar(startPosition: Vector2(xPosition, -100.0), carColor: color));
+    // Create enemy car and add it to the game (spawn much further up)
+    add(EnemyCar(startPosition: Vector2(xPosition, -200.0), carColor: color));
   }
 
   void handleTap(Vector2 tapPosition) {
@@ -118,7 +146,7 @@ class RacingGame extends FlameGame with HasCollisionDetection {
     // Reset game state
     _gameOver = false;
     _score = 0;
-    _spawnTimer = 0.0;
+    _spawnTimer = 2.5; // Reset to 2.5 so first car spawns quickly after restart
 
     // Remove all enemy cars
     children.whereType<EnemyCar>().toList().forEach(

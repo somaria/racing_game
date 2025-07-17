@@ -121,7 +121,7 @@ class PlayerCar extends RectangleComponent
     // Draw car body
     final carRect = Rect.fromLTWH(0, 0, size.x, size.y);
     canvas.drawRRect(
-      RRect.fromRectAndRadius(carRect, const Radius.circular(8)),
+      RRect.fromRectAndRadius(carRect, const Radius.circular(15)),
       paint,
     );
 

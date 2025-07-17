@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../racing_game.dart';
 
 class Road extends Component with HasGameRef<RacingGame> {
-  static const double _lineSpeed = 200.0;
+  static const double _lineSpeed = 160.0;
   late List<Vector2> _roadLines;
   late double _lineSpacing;
 
@@ -11,9 +11,13 @@ class Road extends Component with HasGameRef<RacingGame> {
   Future<void> onLoad() async {
     _lineSpacing = 80.0;
     _roadLines = [];
-    
+
     // Create initial road lines
-    for (double y = -_lineSpacing; y < gameRef.size.y + _lineSpacing; y += _lineSpacing) {
+    for (
+      double y = -_lineSpacing;
+      y < gameRef.size.y + _lineSpacing;
+      y += _lineSpacing
+    ) {
       _roadLines.add(Vector2(gameRef.size.x / 2, y));
     }
   }
@@ -21,11 +25,11 @@ class Road extends Component with HasGameRef<RacingGame> {
   @override
   void update(double dt) {
     super.update(dt);
-    
+
     // Move road lines down
     for (int i = 0; i < _roadLines.length; i++) {
       _roadLines[i].y += _lineSpeed * dt;
-      
+
       // Reset line position if it goes off screen
       if (_roadLines[i].y > gameRef.size.y + _lineSpacing) {
         _roadLines[i].y = -_lineSpacing;
@@ -36,29 +40,26 @@ class Road extends Component with HasGameRef<RacingGame> {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    
+
     // Draw road background
     final roadPaint = Paint()..color = Colors.grey[600]!;
     canvas.drawRect(
       Rect.fromLTWH(0, 0, gameRef.size.x, gameRef.size.y),
       roadPaint,
     );
-    
+
     // Draw road edges
     final edgePaint = Paint()..color = Colors.white;
-    canvas.drawRect(
-      Rect.fromLTWH(40, 0, 10, gameRef.size.y),
-      edgePaint,
-    );
+    canvas.drawRect(Rect.fromLTWH(40, 0, 10, gameRef.size.y), edgePaint);
     canvas.drawRect(
       Rect.fromLTWH(gameRef.size.x - 50, 0, 10, gameRef.size.y),
       edgePaint,
     );
-    
+
     // Draw center line
     final linePaint = Paint()..color = Colors.yellow;
     linePaint.strokeWidth = 4;
-    
+
     for (final linePos in _roadLines) {
       canvas.drawLine(
         Offset(linePos.x, linePos.y),
