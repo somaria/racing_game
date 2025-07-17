@@ -69,9 +69,9 @@ class EnemyCar extends RectangleComponent
 
   @override
   void render(Canvas canvas) {
-    super.render(canvas);
+    // Don't call super.render() to avoid drawing the default rectangle
 
-    // Draw car body
+    // Draw car body with rounded corners (smaller radius than player car)
     final carRect = Rect.fromLTWH(0, 0, size.x, size.y);
     canvas.drawRRect(
       RRect.fromRectAndRadius(carRect, const Radius.circular(8)),

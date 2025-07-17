@@ -110,7 +110,7 @@ class PlayerCar extends RectangleComponent
 
   @override
   void render(Canvas canvas) {
-    super.render(canvas);
+    // Don't call super.render() to avoid drawing the default rectangle
 
     // Apply steering rotation to the entire car
     canvas.save();
@@ -118,11 +118,21 @@ class PlayerCar extends RectangleComponent
     canvas.rotate(_steeringAngle * 0.3); // Subtle car rotation
     canvas.translate(-size.x / 2, -size.y / 2);
 
-    // Draw car body
+    // Draw car body with rounded corners
     final carRect = Rect.fromLTWH(0, 0, size.x, size.y);
     canvas.drawRRect(
       RRect.fromRectAndRadius(carRect, const Radius.circular(15)),
       paint,
+    );
+
+    // Draw border to distinguish player car
+    final borderPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.0;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(carRect, const Radius.circular(15)),
+      borderPaint,
     );
 
     // Draw word
