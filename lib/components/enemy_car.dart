@@ -78,6 +78,16 @@ class EnemyCar extends RectangleComponent
       paint,
     );
 
+    // Draw very light and thin border for subtle definition
+    final borderPaint = Paint()
+      ..color = Colors.white.withOpacity(0.3)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(carRect, const Radius.circular(8)),
+      borderPaint,
+    );
+
     // Draw word
     final textPainter = TextPainter(
       text: TextSpan(
