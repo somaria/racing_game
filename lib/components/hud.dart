@@ -6,6 +6,7 @@ class HUD extends PositionComponent with HasGameRef<RacingGame> {
   late TextComponent _scoreText;
   late TextComponent _gameOverText;
   late TextComponent _tapToRestartText;
+  late TextComponent _instructionsText;
 
   @override
   Future<void> onLoad() async {
@@ -56,22 +57,38 @@ class HUD extends PositionComponent with HasGameRef<RacingGame> {
       gameRef.size.y / 2 - 50,
     );
     add(_tapToRestartText);
+
+    // Instructions text
+    _instructionsText = TextComponent(
+      text: 'Use the steering wheel to turn left/right',
+      textRenderer: TextPaint(
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: Colors.yellow,
+        ),
+      ),
+    );
+    _instructionsText.position = Vector2(20, gameRef.size.y - 50);
+    add(_instructionsText);
   }
 
   @override
   void update(double dt) {
     super.update(dt);
-    
+
     // Update score display
     _scoreText.text = 'Score: ${gameRef.score}';
-    
+
     // Show game over text if the game is over
     if (gameRef.isGameOver) {
       _gameOverText.text = 'GAME OVER';
       _tapToRestartText.text = 'Tap to Restart';
+      _instructionsText.text = '';
     } else {
       _gameOverText.text = '';
       _tapToRestartText.text = '';
+      _instructionsText.text = 'Use the steering wheel to turn left/right';
     }
   }
 }

@@ -1,16 +1,17 @@
 import 'dart:math';
 import 'package:flame/game.dart';
-import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 import 'components/player_car.dart';
 import 'components/enemy_car.dart';
 import 'components/road.dart';
 import 'components/hud.dart';
+import 'components/steering_wheel.dart';
 
 class RacingGame extends FlameGame with HasCollisionDetection {
   late PlayerCar _playerCar;
   late Road _road;
   late HUD _hud;
+  late SteeringWheel _steeringWheel;
   double _spawnTimer = 0.0;
   final Random _random = Random();
   int _score = 0;
@@ -29,6 +30,10 @@ class RacingGame extends FlameGame with HasCollisionDetection {
     // Add HUD
     _hud = HUD();
     add(_hud);
+
+    // Add steering wheel
+    _steeringWheel = SteeringWheel();
+    add(_steeringWheel);
   }
 
   @override
@@ -52,7 +57,7 @@ class RacingGame extends FlameGame with HasCollisionDetection {
     // Randomly choose lane positions
     final lanes = [80.0, 160.0, 240.0];
     double xPosition = lanes[_random.nextInt(lanes.length)];
-    
+
     final colors = [Colors.red, Colors.green, Colors.orange, Colors.purple];
     Color color = colors[_random.nextInt(colors.length)];
 
@@ -67,11 +72,41 @@ class RacingGame extends FlameGame with HasCollisionDetection {
       return;
     }
 
-    // Move player car left or right based on tap position
-    if (tapPosition.x < size.x / 2) {
-      _playerCar.moveLeft(0.1);
+    // Check if tap is on steering wheel first
+    _steeringWheel.handleTouch(tapPosition);
+  }
+
+  void handlePanStart(Vector2 startPosition) {
+    if (_gameOver) return;
+
+    // Handle steering wheel touch first
+    _steeringWheel.handleTouch(startPosition);
+  }
+
+  void handlePanUpdate(Vector2 currentPosition) {
+    if (_gameOver) return;
+
+    // Handle steering wheel touch
+    _steeringWheel.handleTouch(currentPosition);
+  }
+
+  void handlePanEnd() {
+    if (_gameOver) return;
+
+    // Stop steering when pan ends
+    _playerCar.stopSteering();
+  }
+
+  void updateSteering(double steeringInput) {
+    // Update player car based on steering wheel input with better sensitivity
+    if (steeringInput < -0.05) {
+      // Lower threshold for more responsive steering
+      _playerCar.moveLeft(0.016);
+    } else if (steeringInput > 0.05) {
+      // Lower threshold for more responsive steering
+      _playerCar.moveRight(0.016);
     } else {
-      _playerCar.moveRight(0.1);
+      _playerCar.stopSteering();
     }
   }
 
@@ -86,7 +121,9 @@ class RacingGame extends FlameGame with HasCollisionDetection {
     _spawnTimer = 0.0;
 
     // Remove all enemy cars
-    children.whereType<EnemyCar>().toList().forEach((car) => car.removeFromParent());
+    children.whereType<EnemyCar>().toList().forEach(
+      (car) => car.removeFromParent(),
+    );
 
     // Reset player car position
     _playerCar.position = Vector2(

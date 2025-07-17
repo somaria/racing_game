@@ -1,5 +1,4 @@
 import 'package:flame/game.dart';
-import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'racing_game.dart';
 
@@ -10,10 +9,7 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Racing Game',
-      home: GameScreen(),
-    );
+    return MaterialApp(title: 'Racing Game', home: GameScreen());
   }
 }
 
@@ -39,6 +35,19 @@ class _GameScreenState extends State<GameScreen> {
           final renderBox = context.findRenderObject() as RenderBox;
           final localPosition = renderBox.globalToLocal(details.globalPosition);
           game.handleTap(Vector2(localPosition.dx, localPosition.dy));
+        },
+        onPanStart: (details) {
+          final renderBox = context.findRenderObject() as RenderBox;
+          final localPosition = renderBox.globalToLocal(details.globalPosition);
+          game.handlePanStart(Vector2(localPosition.dx, localPosition.dy));
+        },
+        onPanUpdate: (details) {
+          final renderBox = context.findRenderObject() as RenderBox;
+          final localPosition = renderBox.globalToLocal(details.globalPosition);
+          game.handlePanUpdate(Vector2(localPosition.dx, localPosition.dy));
+        },
+        onPanEnd: (details) {
+          game.handlePanEnd();
         },
         child: GameWidget(game: game),
       ),
